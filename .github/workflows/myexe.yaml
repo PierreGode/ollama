@@ -1,5 +1,4 @@
 name: Full Test Pipeline
-
 on:
   push:
     branches: [main]
