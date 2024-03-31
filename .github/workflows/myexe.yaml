@@ -1,32 +1,44 @@
-generate-windows-cpu:
-  environment: release
-  runs-on: windows-latest
-  steps:
-    - uses: actions/checkout@v4
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
-    - name: Install Dependencies and Prepare Environment
-      run: |
-        # Include steps to install any dependencies and prepare environment variables
-        # Ensure CUDA, ROCm, or other required tools are correctly installed and configured
-        # For example, setting up CUDA might look like this:
-        # Invoke-WebRequest -Uri "<CUDA_INSTALLER_URL>" -OutFile "cuda_installer.exe"
-        # Start-Process "cuda_installer.exe" -ArgumentList '-s' -NoNewWindow -Wait
-        # Adjust the above commands based on your dependency requirements
+name: Full Test Pipeline
 
-    - name: Debug - List CUDA Installation (Example)
-      run: |
-        Get-ChildItem "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" -Recurse
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-    - name: Build Project
-      run: |
-        go build -o myapp.exe ./...
-        # This is a simplification. Adjust the command based on your project's needs.
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      
+      - name: Install Dependencies
+        run: |
+          # Example: Install Windows SDK for signtool, if needed
+          choco install windows-sdk-10.1 -y
+          # Add commands here to install any other dependencies required for your project
 
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-exe
-        path: myapp.exe
+      - name: Prepare Environment
+        run: |
+          # Set up any environment variables or paths needed for the build
+          # Example for CUDA, adjust as per actual requirements
+          $cudaInstallPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.3\bin"
+          echo "CUDA_PATH=$cudaInstallPath" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "$cudaInstallPath" | Out-File -Append -FilePath $env:GITHUB_PATH
+
+      - name: Build Executable
+        run: |
+          go build -o myapp.exe ./...
+          # Adjust the build command as necessary for your project
+
+      - name: Upload EXE as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: myapp.exe
