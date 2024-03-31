@@ -1,29 +1,32 @@
-name: Build and Upload Windows EXE
+generate-windows-cpu:
+  environment: release
+  runs-on: windows-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    - name: Install Dependencies and Prepare Environment
+      run: |
+        # Include steps to install any dependencies and prepare environment variables
+        # Ensure CUDA, ROCm, or other required tools are correctly installed and configured
+        # For example, setting up CUDA might look like this:
+        # Invoke-WebRequest -Uri "<CUDA_INSTALLER_URL>" -OutFile "cuda_installer.exe"
+        # Start-Process "cuda_installer.exe" -ArgumentList '-s' -NoNewWindow -Wait
+        # Adjust the above commands based on your dependency requirements
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    - name: Debug - List CUDA Installation (Example)
+      run: |
+        Get-ChildItem "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" -Recurse
 
-jobs:
-  build-and-upload:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-      
-      - name: Build executable
-        run: go build -o myapp.exe ./...
-        # Ensure this command correctly builds your .exe. Adjust as needed.
-      
-      - name: Upload EXE as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-exe
-          path: myapp.exe
+    - name: Build Project
+      run: |
+        go build -o myapp.exe ./...
+        # This is a simplification. Adjust the command based on your project's needs.
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-exe
+        path: myapp.exe
