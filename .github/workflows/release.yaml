@@ -1,10 +1,10 @@
 name: release
+
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-
+    tags:
+      - 'v*'
+      
 jobs:
   # Full build of the Mac assets
   build-darwin:
