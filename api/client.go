@@ -58,7 +58,7 @@ func ClientFromEnvironment() (*Client, error) {
 
 	host, port, err := net.SplitHostPort(hostport)
 	if err != nil {
-		host, port = "127.0.0.1", defaultPort
+		host, port = "0.0.0.0", defaultPort
 		if ip := net.ParseIP(strings.Trim(hostport, "[]")); ip != nil {
 			host = ip.String()
 		} else if hostport != "" {
